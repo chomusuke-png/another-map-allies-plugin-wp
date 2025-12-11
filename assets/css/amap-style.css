@@ -1,0 +1,71 @@
+/* Contenedor Principal del Mapa */
+.amap-map-container {
+    position: relative;
+    width: 100%;
+    height: auto;
+    /* La imagen de fondo se asegura de cubrir el área */
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center top;
+    /* Un borde opcional para delimitar el área */
+    border: 1px solid #eee;
+    /* Un ratio de aspecto básico para evitar colapso si la imagen de fondo falla. Ajusta según tu imagen real */
+    min-height: 300px;
+}
+
+/* El punto en el mapa */
+.amap-map-point {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    background-color: #D32F2F; /* Rojo NHLA de tu tema anterior */
+    border: 2px solid #FFFFFF;
+    border-radius: 50%;
+    cursor: pointer;
+    transform: translate(-50%, -50%); /* Centrar el punto exacto en la coordenada */
+    z-index: 10;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
+
+.amap-map-point:hover {
+    background-color: #1A428A; /* Azul NHLA al pasar el mouse */
+    transform: translate(-50%, -50%) scale(1.2);
+    z-index: 20;
+}
+
+/* El Tooltip (Nombre del Aliado) */
+.amap-tooltip {
+    position: absolute;
+    bottom: 25px; /* Aparece encima del punto */
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.85);
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease;
+    pointer-events: none; /* Evita que el tooltip interfiera con el mouse */
+}
+
+/* Triangulito inferior del tooltip */
+.amap-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: rgba(0, 0, 0, 0.85) transparent transparent transparent;
+}
+
+/* Mostrar tooltip al pasar el mouse sobre el punto */
+.amap-map-point:hover .amap-tooltip {
+    opacity: 1;
+    visibility: visible;
+}

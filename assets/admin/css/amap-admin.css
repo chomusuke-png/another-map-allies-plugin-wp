@@ -1,0 +1,39 @@
+/* Contenedor del mapa en el admin */
+.amap-admin-map-wrapper {
+    position: relative;
+    display: inline-block; /* Se ajusta al tamaño de la imagen */
+    max-width: 100%;
+    border: 2px solid #ccc;
+    cursor: crosshair; /* Cursor de cruz para indicar precisión */
+    overflow: hidden;
+}
+
+.amap-admin-map-image {
+    display: block;
+    max-width: 100%; /* Responsive dentro del admin */
+    height: auto;
+}
+
+/* El Pin Visual en el Admin */
+.amap-admin-pin {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    background-color: #D32F2F;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    transform: translate(-50%, -50%); /* Centrar en el clic */
+    pointer-events: none; /* Para que el clic pase a la imagen si se hace muy seguido */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+    transition: top 0.2s, left 0.2s;
+}
+
+.amap-coords-display {
+    margin-top: 15px;
+    padding: 10px;
+    background: #f0f0f1;
+    border: 1px solid #ccc;
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
