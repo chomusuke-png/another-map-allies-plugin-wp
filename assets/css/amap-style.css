@@ -1,27 +1,24 @@
 .amap-wrapper {
     position: relative;
     width: 100%;
-    /* Aseguramos que el SVG pueda cubrir todo */
 }
 
-/* --- SVG Layer --- */
 .amap-global-svg {
     position: absolute;
     top: 0; left: 0;
     width: 100%; height: 100%;
-    pointer-events: none; /* Dejar pasar clics */
+    pointer-events: none;
     z-index: 10;
 }
 
 .amap-connector {
-    stroke: #ccc; /* Línea gris tenue por defecto */
+    stroke: #ccc;
     stroke-width: 1px;
     transition: all 0.3s ease;
     opacity: 0.3;
 }
-
 .amap-connector.active {
-    stroke: #D32F2F; /* Rojo al hover */
+    stroke: #D32F2F;
     stroke-width: 2px;
     opacity: 1;
 }
@@ -30,16 +27,22 @@
 .amap-grid-section {
     display: flex;
     flex-wrap: wrap;
-    gap: 15px;
+    gap: 20px; /* Un poco más de espacio */
     justify-content: center;
-    margin-bottom: 20px;
+    margin-bottom: 30px;
     position: relative;
-    z-index: 20; /* Encima de las líneas */
+    z-index: 20;
 }
 
 .amap-grid-item {
     position: relative;
     cursor: pointer;
+    /* Flex vertical para logo y nombre */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 80px; /* Ancho fijo para alineación */
+    text-align: center;
 }
 
 .amap-logo-box {
@@ -50,6 +53,9 @@
     padding: 5px;
     display: flex; align-items: center; justify-content: center;
     transition: transform 0.2s;
+    margin-bottom: 5px; /* Espacio entre logo y nombre */
+    z-index: 25; /* Asegurar que esté encima para el cálculo de líneas */
+    background: #fff; /* Asegurar fondo para tapar la línea si cruza */
 }
 
 .amap-grid-item:hover .amap-logo-box {
@@ -65,10 +71,19 @@
     border-radius: 50%;
 }
 
-/* --- Tooltip Card (Información) --- */
+/* Nuevo: Nombre del Aliado */
+.amap-ally-name {
+    font-size: 11px;
+    color: #444;
+    line-height: 1.2;
+    font-weight: 600;
+}
+
+/* --- Tooltip --- */
 .amap-tooltip-card {
     position: absolute;
-    top: 100%; left: 50%;
+    top: 70px; /* Bajamos el tooltip para que no tape el nombre */
+    left: 50%;
     transform: translateX(-50%) translateY(10px);
     background: #fff;
     width: 180px;
@@ -78,58 +93,24 @@
     opacity: 0; visibility: hidden;
     transition: all 0.3s;
     z-index: 100;
-    text-align: center;
     pointer-events: none;
+    border: 1px solid #eee;
 }
 
 .amap-grid-item:hover .amap-tooltip-card {
     opacity: 1; visibility: visible;
-    transform: translateX(-50%) translateY(5px);
+    transform: translateX(-50%) translateY(0);
 }
 
-.amap-tooltip-card h5 {
-    margin: 0 0 5px 0;
-    font-size: 13px;
-    color: #333;
-}
-
-.amap-tooltip-card span {
-    display: block;
-    font-size: 10px;
-    color: #666;
-    background: #f4f4f4;
-    margin-bottom: 2px;
-    padding: 2px;
-    border-radius: 3px;
-}
+.amap-tooltip-card h5 { margin: 0 0 5px 0; font-size: 13px; color: #333; }
+.amap-tooltip-card span { display: block; font-size: 10px; color: #666; background: #f4f4f4; margin-bottom: 2px; padding: 2px; border-radius: 3px; }
 
 /* --- Map Section --- */
-.amap-map-section {
-    position: relative;
-    width: 100%;
-    z-index: 5;
-}
-
-.amap-base-image {
-    width: 100%;
-    height: auto;
-    display: block;
-}
-
+.amap-map-section { position: relative; width: 100%; z-index: 5; }
+.amap-base-image { width: 100%; height: auto; display: block; }
 .amap-pin {
-    position: absolute;
-    width: 10px; height: 10px;
-    background: #D32F2F;
-    border: 2px solid #fff;
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    transition: transform 0.3s;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    position: absolute; width: 10px; height: 10px; background: #D32F2F;
+    border: 2px solid #fff; border-radius: 50%; transform: translate(-50%, -50%);
+    transition: transform 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.3);
 }
-
-.amap-pin.active {
-    transform: translate(-50%, -50%) scale(1.5);
-    background: #fff;
-    border-color: #D32F2F;
-    z-index: 50;
-}
+.amap-pin.active { transform: translate(-50%, -50%) scale(1.5); background: #fff; border-color: #D32F2F; z-index: 50; }
