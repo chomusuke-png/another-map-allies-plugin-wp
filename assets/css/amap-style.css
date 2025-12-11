@@ -1,71 +1,135 @@
-/* Contenedor Principal del Mapa */
-.amap-map-container {
+.amap-wrapper {
     position: relative;
     width: 100%;
-    height: auto;
-    /* La imagen de fondo se asegura de cubrir el área */
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center top;
-    /* Un borde opcional para delimitar el área */
-    border: 1px solid #eee;
-    /* Un ratio de aspecto básico para evitar colapso si la imagen de fondo falla. Ajusta según tu imagen real */
-    min-height: 300px;
+    /* Aseguramos que el SVG pueda cubrir todo */
 }
 
-/* El punto en el mapa */
-.amap-map-point {
+/* --- SVG Layer --- */
+.amap-global-svg {
     position: absolute;
-    width: 16px;
-    height: 16px;
-    background-color: #D32F2F; /* Rojo NHLA de tu tema anterior */
-    border: 2px solid #FFFFFF;
-    border-radius: 50%;
-    cursor: pointer;
-    transform: translate(-50%, -50%); /* Centrar el punto exacto en la coordenada */
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none; /* Dejar pasar clics */
     z-index: 10;
+}
+
+.amap-connector {
+    stroke: #ccc; /* Línea gris tenue por defecto */
+    stroke-width: 1px;
     transition: all 0.3s ease;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    opacity: 0.3;
 }
 
-.amap-map-point:hover {
-    background-color: #1A428A; /* Azul NHLA al pasar el mouse */
-    transform: translate(-50%, -50%) scale(1.2);
-    z-index: 20;
-}
-
-/* El Tooltip (Nombre del Aliado) */
-.amap-tooltip {
-    position: absolute;
-    bottom: 25px; /* Aparece encima del punto */
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: rgba(0, 0, 0, 0.85);
-    color: #fff;
-    padding: 5px 10px;
-    border-radius: 4px;
-    font-size: 12px;
-    white-space: nowrap;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s ease;
-    pointer-events: none; /* Evita que el tooltip interfiera con el mouse */
-}
-
-/* Triangulito inferior del tooltip */
-.amap-tooltip::after {
-    content: '';
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    margin-left: -5px;
-    border-width: 5px;
-    border-style: solid;
-    border-color: rgba(0, 0, 0, 0.85) transparent transparent transparent;
-}
-
-/* Mostrar tooltip al pasar el mouse sobre el punto */
-.amap-map-point:hover .amap-tooltip {
+.amap-connector.active {
+    stroke: #D32F2F; /* Rojo al hover */
+    stroke-width: 2px;
     opacity: 1;
-    visibility: visible;
+}
+
+/* --- Grid Section --- */
+.amap-grid-section {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+    margin-bottom: 20px;
+    position: relative;
+    z-index: 20; /* Encima de las líneas */
+}
+
+.amap-grid-item {
+    position: relative;
+    cursor: pointer;
+}
+
+.amap-logo-box {
+    width: 60px; height: 60px;
+    border: 1px solid #ddd;
+    border-radius: 50%;
+    background: #fff;
+    padding: 5px;
+    display: flex; align-items: center; justify-content: center;
+    transition: transform 0.2s;
+}
+
+.amap-grid-item:hover .amap-logo-box {
+    transform: scale(1.1);
+    border-color: #D32F2F;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.amap-logo-box img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border-radius: 50%;
+}
+
+/* --- Tooltip Card (Información) --- */
+.amap-tooltip-card {
+    position: absolute;
+    top: 100%; left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    background: #fff;
+    width: 180px;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    opacity: 0; visibility: hidden;
+    transition: all 0.3s;
+    z-index: 100;
+    text-align: center;
+    pointer-events: none;
+}
+
+.amap-grid-item:hover .amap-tooltip-card {
+    opacity: 1; visibility: visible;
+    transform: translateX(-50%) translateY(5px);
+}
+
+.amap-tooltip-card h5 {
+    margin: 0 0 5px 0;
+    font-size: 13px;
+    color: #333;
+}
+
+.amap-tooltip-card span {
+    display: block;
+    font-size: 10px;
+    color: #666;
+    background: #f4f4f4;
+    margin-bottom: 2px;
+    padding: 2px;
+    border-radius: 3px;
+}
+
+/* --- Map Section --- */
+.amap-map-section {
+    position: relative;
+    width: 100%;
+    z-index: 5;
+}
+
+.amap-base-image {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.amap-pin {
+    position: absolute;
+    width: 10px; height: 10px;
+    background: #D32F2F;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: transform 0.3s;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.amap-pin.active {
+    transform: translate(-50%, -50%) scale(1.5);
+    background: #fff;
+    border-color: #D32F2F;
+    z-index: 50;
 }

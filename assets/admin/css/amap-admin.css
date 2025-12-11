@@ -1,39 +1,67 @@
-/* Contenedor del mapa en el admin */
-.amap-admin-map-wrapper {
-    position: relative;
-    display: inline-block; /* Se ajusta al tamaño de la imagen */
-    max-width: 100%;
-    border: 2px solid #ccc;
-    cursor: crosshair; /* Cursor de cruz para indicar precisión */
-    overflow: hidden;
+.amap-admin-wrapper {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
 }
 
-.amap-admin-map-image {
+.amap-admin-controls {
+    width: 300px;
+    background: #fff;
+    padding: 15px;
+    border: 1px solid #ccc;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.amap-admin-controls label {
     display: block;
-    max-width: 100%; /* Responsive dentro del admin */
+    margin-bottom: 8px;
+    font-size: 12px;
+}
+
+.amap-admin-controls input[type="text"] {
+    width: 100%;
+    margin-top: 2px;
+}
+
+.amap-admin-preview {
+    position: relative;
+    border: 2px solid #ccc;
+    max-width: 100%;
+}
+
+.amap-map-img {
+    display: block;
+    max-width: 100%;
     height: auto;
 }
 
-/* El Pin Visual en el Admin */
 .amap-admin-pin {
     position: absolute;
-    width: 16px;
-    height: 16px;
-    background-color: #D32F2F;
-    border: 2px solid #fff;
+    width: 10px; height: 10px;
+    background: red; border: 2px solid white;
     border-radius: 50%;
-    transform: translate(-50%, -50%); /* Centrar en el clic */
-    pointer-events: none; /* Para que el clic pase a la imagen si se hace muy seguido */
-    box-shadow: 0 2px 5px rgba(0,0,0,0.5);
-    transition: top 0.2s, left 0.2s;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 5;
 }
 
-.amap-coords-display {
-    margin-top: 15px;
-    padding: 10px;
-    background: #f0f0f1;
-    border: 1px solid #ccc;
-    display: flex;
-    gap: 20px;
-    align-items: center;
+.amap-admin-logo {
+    position: absolute;
+    width: 30px; height: 30px;
+    background-size: cover;
+    background-position: center;
+    border: 2px solid #333;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 6;
+    display: flex; align-items: center; justify-content: center;
+    cursor: grab;
+}
+
+.amap-admin-svg {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 1;
 }
