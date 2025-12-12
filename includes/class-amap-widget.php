@@ -2,15 +2,19 @@
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 
 /**
- * Widget del Mapa con Aliados (Distribución Inteligente por Proximidad).
+ * Widget del Mapa con Aliados.
+ * * Características:
+ * 1. Balanceo de Carga: Distribuye aliados priorizando zonas horizontales (2:1).
+ * 2. Ordenamiento Geométrico: Evita líneas cruzadas ordenando por coordenadas.
+ * 3. Visibilidad: Muestra títulos en burbujas y tooltips en los pines del mapa.
  */
 class AMAP_Grid_Map_Widget extends WP_Widget {
 
 	public function __construct() {
 		parent::__construct(
 			'amap_grid_map',
-			__( 'Mapa con Aliados (Inteligente)', 'amap-domain' ),
-			array( 'description' => __( 'Distribuye los aliados en el borde más cercano a su ubicación geográfica.', 'amap-domain' ) )
+			__( 'Mapa con Aliados (Completo)', 'amap-domain' ),
+			array( 'description' => __( 'Distribuye los aliados, ordena conexiones y muestra títulos.', 'amap-domain' ) )
 		);
 	}
 
@@ -25,92 +29,114 @@ class AMAP_Grid_Map_Widget extends WP_Widget {
 
 		echo $args['before_widget'];
 		
+		// --- TÍTULO DEL WIDGET ---
 		if ( ! empty( $instance['title'] ) ) {
 			echo $args['before_title'] . esc_html( $instance['title'] ) . $args['after_title'];
 		}
 
 		if ( $allies_query->have_posts() ) : 
 			
-			// Inicializar zonas
+			$posts = $allies_query->get_posts();
+			$valid_posts = array();
+
+			// 1. Filtrar posts válidos
+			foreach ( $posts as $post ) {
+				$t_val = get_post_meta( $post->ID, '_amap_pin_top', true );
+				$l_val = get_post_meta( $post->ID, '_amap_pin_left', true );
+				
+				if ( $t_val !== '' && $l_val !== '' ) {
+					$valid_posts[] = array(
+						'post' => $post,
+						'top'  => (float) $t_val,
+						'left' => (float) $l_val
+					);
+				}
+			}
+
+			$total = count( $valid_posts );
+
+			// 2. Definir Capacidades (Ratio 2:1 a favor de horizontal)
+			$share_unit = $total / 6;
+			$limit_horizontal = max( 1, ceil( $share_unit * 2 ) ); 
+			$limit_vertical   = max( 1, ceil( $share_unit * 1 ) );
+
 			$zones = array(
 				'top'    => array(),
 				'right'  => array(),
 				'bottom' => array(),
 				'left'   => array(),
 			);
-			
-			$posts = $allies_query->get_posts();
-			
-			// --- ALGORITMO DE PROXIMIDAD ---
-			foreach ( $posts as $post ) {
-				$id = $post->ID;
-				// Obtenemos coordenadas (si no existen, saltamos)
-				$t_val = get_post_meta( $id, '_amap_pin_top', true );
-				$l_val = get_post_meta( $id, '_amap_pin_left', true );
 
-				if ( $t_val === '' || $l_val === '' ) {
-					continue; 
+			// 3. Procesar distribución (Balanceo)
+			foreach ( $valid_posts as $item ) {
+				$top  = $item['top'];
+				$left = $item['left'];
+
+				$distances = array(
+					'top'    => $top,
+					'bottom' => 100 - $top,
+					'left'   => $left,
+					'right'  => 100 - $left
+				);
+
+				asort( $distances );
+
+				$assigned = false;
+				foreach ( $distances as $zone_name => $dist ) {
+					$current_limit = ( $zone_name === 'top' || $zone_name === 'bottom' ) ? $limit_horizontal : $limit_vertical;
+
+					if ( count( $zones[ $zone_name ] ) < $current_limit ) {
+						$zones[ $zone_name ][] = $item; 
+						$assigned = true;
+						break;
+					}
 				}
 
-				$top  = (float) $t_val;
-				$left = (float) $l_val;
-
-				// Calcular distancia a los 4 bordes (0-100%)
-				$dist_top    = $top;          // Distancia al borde superior (0)
-				$dist_bottom = 100 - $top;    // Distancia al borde inferior (100)
-				$dist_left   = $left;         // Distancia al borde izquierdo (0)
-				$dist_right  = 100 - $left;   // Distancia al borde derecho (100)
-
-				// Encontrar la distancia mínima
-				$min_dist = min( $dist_top, $dist_bottom, $dist_left, $dist_right );
-
-				// Asignar a la zona ganadora
-				if ( $min_dist === $dist_top ) {
-					$zones['top'][] = $post;
-				} elseif ( $min_dist === $dist_bottom ) {
-					$zones['bottom'][] = $post;
-				} elseif ( $min_dist === $dist_left ) {
-					$zones['left'][] = $post;
-				} else {
-					$zones['right'][] = $post;
+				if ( ! $assigned ) {
+					$first_choice = array_key_first( $distances );
+					$zones[ $first_choice ][] = $item;
 				}
 			}
+
+			// 4. ORDENAMIENTO (Evitar cruces)
+			// Horizontales -> Ordenar por X (Left)
+			usort( $zones['top'], function($a, $b) { return $a['left'] <=> $b['left']; } );
+			usort( $zones['bottom'], function($a, $b) { return $a['left'] <=> $b['left']; } );
+			// Verticales -> Ordenar por Y (Top)
+			usort( $zones['left'], function($a, $b) { return $a['top'] <=> $b['top']; } );
+			usort( $zones['right'], function($a, $b) { return $a['top'] <=> $b['top']; } );
+
+			// Limpiar arrays para renderizado
+			foreach ( $zones as $key => $items ) {
+				$zones[ $key ] = array_column( $items, 'post' );
+			}
+
 			?>
 			
 			<div class="amap-wrapper">
 				<svg class="amap-global-svg"></svg>
 
 				<?php 
-				// Renderizar Zona SUPERIOR
 				$this->render_zone( 'top', $zones['top'] );
-				
-				// Renderizar Zona IZQUIERDA
 				$this->render_zone( 'left', $zones['left'] );
-				
-				// --- MAPA CENTRAL ---
 				?>
+				
 				<div class="amap-map-section">
 					<img src="<?php echo esc_url( $map_image_url ); ?>" class="amap-base-image" alt="World Map">
-					
 					<?php 
 					// Renderizar PINES
-					foreach ( $posts as $post ) {
-						$id = $post->ID;
-						$top  = get_post_meta( $id, '_amap_pin_top', true );
-						$left = get_post_meta( $id, '_amap_pin_left', true );
-						
-						if ( $top !== '' && $left !== '' ) {
-							echo '<div class="amap-pin" data-id="' . esc_attr($id) . '" style="top:' . esc_attr($top) . '%; left:' . esc_attr($left) . '%;"></div>';
-						}
+					foreach ( $valid_posts as $item ) {
+						$p = $item['post'];
+						$t = $item['top'];
+						$l = $item['left'];
+						// AGREGADO: title="..." para mostrar nombre al pasar el mouse por el pin
+						echo '<div class="amap-pin" data-id="' . esc_attr( $p->ID ) . '" title="' . esc_attr( $p->post_title ) . '" style="top:' . esc_attr( $t ) . '%; left:' . esc_attr( $l ) . '%;"></div>';
 					}
 					?>
 				</div>
+
 				<?php
-				
-				// Renderizar Zona DERECHA
 				$this->render_zone( 'right', $zones['right'] );
-				
-				// Renderizar Zona INFERIOR
 				$this->render_zone( 'bottom', $zones['bottom'] );
 				?>
 
@@ -122,11 +148,7 @@ class AMAP_Grid_Map_Widget extends WP_Widget {
 		echo $args['after_widget'];
 	}
 
-	/**
-	 * Renderiza una zona específica con sus aliados.
-	 */
 	private function render_zone( $zone_name, $posts ) {
-		// Agregamos la clase de zona para el CSS Grid
 		echo '<div class="amap-zone amap-zone-' . esc_attr( $zone_name ) . '">';
 		
 		if ( ! empty( $posts ) ) {

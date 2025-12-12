@@ -7,13 +7,13 @@
         "top top top"
         "left map right"
         "bottom bottom bottom";
-    grid-template-columns: 100px 1fr 100px; /* Columnas laterales de ancho fijo */
+    grid-template-columns: 80px 1fr 80px; /* Reducido de 100px para ajustar a nuevas burbujas */
     grid-template-rows: auto 1fr auto;
-    gap: 20px;
-    align-items: center; /* Centrar verticalmente */
+    gap: 15px;
+    align-items: center; 
 }
 
-/* --- SVG Layer (Debe cubrir todo el Grid) --- */
+/* --- SVG Layer --- */
 .amap-global-svg {
     position: absolute;
     top: 0; left: 0;
@@ -33,7 +33,7 @@
 /* --- ZONAS --- */
 .amap-zone {
     display: flex;
-    gap: 15px;
+    gap: 10px; /* Reducido el gap entre elementos */
     position: relative;
     z-index: 20;
 }
@@ -71,19 +71,19 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 80px;
+    width: 60px; /* ANTES: 80px */
     text-align: center;
 }
 
 .amap-logo-box {
-    width: 50px; height: 50px;
+    width: 40px; height: 40px; /* ANTES: 50px */
     border: 1px solid #ddd;
     border-radius: 50%;
     background: #fff;
     padding: 3px;
     display: flex; align-items: center; justify-content: center;
     transition: transform 0.2s;
-    margin-bottom: 5px;
+    margin-bottom: 4px;
     z-index: 25;
     background: #fff;
     box-shadow: 0 2px 4px rgba(0,0,0,0.05);
@@ -101,7 +101,12 @@
 }
 
 .amap-ally-name {
-    font-size: 10px; color: #444; line-height: 1.1; font-weight: 600;
+    font-size: 9px; /* ANTES: 10px */
+    color: #444; line-height: 1.1; font-weight: 600;
+    overflow: hidden; text-overflow: ellipsis; /* Evita que nombres largos rompan mucho */
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* Máximo 2 líneas de texto */
+    -webkit-box-orient: vertical;
 }
 
 /* --- SECCIÓN DEL MAPA (Centro) --- */
@@ -115,25 +120,25 @@
     width: 100%; height: auto; display: block;
 }
 .amap-pin {
-    position: absolute; width: 8px; height: 8px; background: #D32F2F;
-    border: 2px solid #fff; border-radius: 50%; transform: translate(-50%, -50%);
-    transition: transform 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    position: absolute; width: 6px; height: 6px; /* Ajuste ligero al pin también */
+    background: #D32F2F;
+    border: 1px solid #fff; border-radius: 50%; transform: translate(-50%, -50%);
+    transition: transform 0.3s; box-shadow: 0 1px 3px rgba(0,0,0,0.3);
 }
 .amap-pin.active { transform: translate(-50%, -50%) scale(1.5); background: #fff; border-color: #D32F2F; z-index: 50; }
 
 /* --- TOOLTIP --- */
 .amap-tooltip-card {
     position: absolute;
-    /* Ajuste dinámico para que no se salga de la pantalla en los laterales */
-    top: 60px; left: 50%; transform: translateX(-50%) translateY(10px);
-    background: #fff; width: 160px; padding: 10px; border-radius: 5px;
+    top: 50px; left: 50%; transform: translateX(-50%) translateY(10px);
+    background: #fff; width: 140px; padding: 8px; border-radius: 5px;
     box-shadow: 0 5px 15px rgba(0,0,0,0.2); opacity: 0; visibility: hidden;
     transition: all 0.3s; z-index: 100; pointer-events: none; border: 1px solid #eee;
 }
 .amap-grid-item:hover .amap-tooltip-card {
     opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0);
 }
-.amap-tooltip-card h5 { margin: 0 0 5px 0; font-size: 12px; color: #333; }
+.amap-tooltip-card h5 { margin: 0 0 5px 0; font-size: 11px; color: #333; }
 .amap-tooltip-card span { display: block; font-size: 9px; color: #666; background: #f4f4f4; margin-bottom: 2px; padding: 2px; border-radius: 3px; }
 
 /* --- RESPONSIVE (Móvil) --- */
@@ -142,14 +147,13 @@
         grid-template-areas:
             "top"
             "map"
-            "left"  /* En móvil, ponemos los laterales abajo del mapa para dar espacio */
+            "left"
             "right"
             "bottom";
-        grid-template-columns: 1fr; /* Una sola columna */
+        grid-template-columns: 1fr;
         gap: 10px;
     }
     
-    /* En móvil, las columnas laterales se vuelven filas horizontales */
     .amap-zone-left, .amap-zone-right {
         flex-direction: row;
         flex-wrap: wrap;
